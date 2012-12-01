@@ -1,17 +1,18 @@
-class Terminal:
+import symbol as Symbol
+
+class Terminal(Symbol):
     """
     terminal class for sequitur
     based on java implementation
     """
 
-    int theValue
+    theValue = None
 
     def __init__(self, theValue):
         value = theValue
         p = null
         n = null
 
-    def cleanUp():
+    def cleanUp(self):
         join(self.p,self.n)
         deleteDigram()
-        
