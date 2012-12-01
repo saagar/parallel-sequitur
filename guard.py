@@ -4,7 +4,7 @@ class Guard:
   based on java implementation
   """
 
-  rule r;
+  rule r
 
   def __guard(self, rule):
     self.r = rule;
