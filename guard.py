@@ -1,4 +1,6 @@
-class Guard:
+import symbol as Symbol
+
+class Guard(Symbol):
   """
   guard class for sequitur
   based on java implementation

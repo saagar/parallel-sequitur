@@ -1,3 +1,5 @@
+import guard as Guard
+
 class Symbol:
   
   numTerminals = 100000
