@@ -8,7 +8,8 @@ class Guard(Symbol):
 
   rule r
 
-  def __guard(self, rule):
+  def __init__(self, rule):
+    super(Guard,self).__init__(rule)
     self.r = rule;
     value = 0;
     p = self

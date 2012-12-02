@@ -103,5 +103,3 @@ class Symbol:
   # Do NOT use to compare two symbols
   def equals(obj):
     return ((self.value == ((symbol)obj).value) and (self.n.value == ((symbol)obj).n.value))
-
-

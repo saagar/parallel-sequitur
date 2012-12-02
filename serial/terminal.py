@@ -9,7 +9,8 @@ class Terminal(Symbol):
     theValue = None
 
     def __init__(self, theValue):
-        value = theValue
+        super(Terminal,self).__init__(theValue)
+        self.value = theValue
         p = null
         n = null
 
