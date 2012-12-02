@@ -1,6 +1,14 @@
 import rule as Rule
 
 class Sequitur:
-    def __init__(self):
-        firstRule = rule()
-        
+    def runSequitur(self):
+        firstRule = Rule()
+        i = 0
+        // reset number of rules and hashtable
+        rule.numRules = 0
+        symbol.theDigrams.clear()
+        firstRule.last().insertAfter()
+
+    
+
+            
