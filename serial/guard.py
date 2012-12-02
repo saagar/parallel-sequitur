@@ -29,4 +29,4 @@ class Guard(Symbol):
     pass
 
   def check(self):
-    return false
+    return False

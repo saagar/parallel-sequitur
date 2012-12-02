@@ -9,14 +9,14 @@ class Terminal(Symbol):
     based on java implementation
     """
 
-    theValue = None
+    value = None
 
     def __init__(self, theValue):
-        super(Terminal,self).__init__(theValue)
+        super(Terminal,self).__init__()
         self.value = theValue
-        p = null
-        n = null
+        self.p = None
+        self.n = None
 
     def cleanUp(self):
-        join(self.p,self.n)
-        deleteDigram()
+        self.join(self.p,self.n)
+        self.deleteDigram()
