@@ -1,6 +1,9 @@
-import guard as Guard
+from guard import Guard
+from rule import Rule
+from nonTerminal import NonTerminal
+from terminal import Terminal
 
-class Symbol:
+class Symbol(object):
   
   numTerminals = 100000
   prime = 2265539

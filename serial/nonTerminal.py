@@ -1,4 +1,9 @@
-class nonTerminal:
+from guard import Guard
+from rule import Rule
+from terminal import Terminal
+from symbol import Symbol
+
+class NonTerminal(Symbol):
     """
     nonTerminal class for sequitur
     based on java implementation

@@ -1,4 +1,9 @@
-class Rule:
+from guard import Guard
+from nonTerminal import NonTerminal
+from terminal import Terminal
+from symbol import Symbol
+
+class Rule(object):
   # guard symbol to mark beginning and end of rule.
   theGuard = guard()
   # counter for number of times rule is used

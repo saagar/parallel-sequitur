@@ -1,4 +1,7 @@
-import symbol as Symbol
+from guard import Guard
+from rule import Rule
+from symbol import Symbol
+from nonTerminal import NonTerminal
 
 class Terminal(Symbol):
     """
