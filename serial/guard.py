@@ -16,8 +16,8 @@ class Guard(Symbol):
     super(Guard,self).__init__()
     self.r = rule;
     value = 0;
-    p = self
-    n = self
+    self.p = self
+    self.n = self
 
   def cleanUp(self):
     join(p,n)

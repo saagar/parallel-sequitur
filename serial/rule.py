@@ -19,15 +19,15 @@ class Rule(object):
   def __init__(self):
     self.number = Rule.numRules
     Rule.numRules += 1
-    theGuard = Guard(self)
     self.count = 0
-    index = 0
+    self.index = 0
+    self.theGuard = Guard(self)
 
   def first(self):
-    return theGuard.n
+    return self.theGuard.n
 
   def last(self):
-    return theGuard.p
+    return self.theGuard.p
 
   def getRules(self):
     rules = []
