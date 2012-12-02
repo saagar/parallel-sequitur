@@ -1,7 +1,7 @@
-from guard import Guard
-from rule import Rule
-from nonTerminal import NonTerminal
-from terminal import Terminal
+#from guard import Guard
+#from rule import Rule
+#from nonTerminal import NonTerminal
+#from terminal import Terminal
 
 class Symbol(object):
   
@@ -71,14 +71,14 @@ class Symbol(object):
     r, first, second, dummy = None, None, None, None
     if matchingSymbol.p.isGuard() and matchingSymbol.n.n.isGuard():
       # reuse existing rule
-      r = ((guard)matchingSymbol.p).r
+      r = (matchingSymbol.p).r
       newDigram.substitute(r)
     else:
       # create a new rule
       r = rule()
       try:
-        first = (symbol)newDigram.clone()
-        second = (symbol)newDigram.n.clone()
+        first = newDigram.clone()#(symbol)newDigram.clone()
+        second = newDigram.n.clone()#(symbol)newDigram.n.clone()
         r.theGuard.n = first
         first.p = r.theGuard
         first.n = second
@@ -86,7 +86,7 @@ class Symbol(object):
         second.n = r.TheGuard
         r.theGuard.p = second
 
-        dummy = (symbol)theDigrams[first] = first
+        dummy = theDigrams[first] = first
         matchingSymbol.substitute(r)
         newDigram.substitute(r)
       except:
@@ -94,10 +94,10 @@ class Symbol(object):
         raise
 
     # check for underused rule
-    if r.first().isNonTerminal() and (nonTerminal)r.first()).r.count == 1:
-      ((nonTerminal)r.first()).expand()
+    if r.first().isNonTerminal() and r.first().r.count == 1:
+      (r.first()).expand()
 
-  def hashCode(self)
+  def hashCode(self):
     code = ((21599*self.value) + (20507*self.n.value))
     code = code % self.prime
     return code
@@ -105,4 +105,4 @@ class Symbol(object):
   # Test if two digrams are equal
   # Do NOT use to compare two symbols
   def equals(obj):
-    return ((self.value == ((symbol)obj).value) and (self.n.value == ((symbol)obj).n.value))
+    return ((self.value == (obj).value) and (self.n.value == (obj).n.value))

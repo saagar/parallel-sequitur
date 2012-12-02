@@ -1,5 +1,5 @@
-from guard import Guard
-from rule import Rule
+#from guard import Guard
+#from rule import Rule
 from terminal import Terminal
 from symbol import Symbol
 
@@ -9,7 +9,8 @@ class NonTerminal(Symbol):
     based on java implementation
     """
 
-    rule r
+    #rule
+    r = None
 
     def __init__(self, theRule):
         r = theRule
@@ -18,7 +19,7 @@ class NonTerminal(Symbol):
         p = null
         n = null
 
-    class clone:
+    def clone(self):
         sym = nonTerminal(self.r)
         sym.p = p
         sym.n = n

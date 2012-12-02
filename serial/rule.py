@@ -5,7 +5,7 @@ from symbol import Symbol
 
 class Rule(object):
   # guard symbol to mark beginning and end of rule.
-  theGuard = guard()
+  theGuard = None
   # counter for number of times rule is used
   count = 0
   # total number of rules, this should always be static
@@ -19,7 +19,7 @@ class Rule(object):
   def __init__(self):
     self.number = Rule.numRules
     Rule.numRules += 1
-    theGuard = guard(self)
+    theGuard = Guard(self)
     self.count = 0
     index = 0
 
@@ -41,14 +41,14 @@ class Rule(object):
     text = text + "Usage\tRule\n"
     rules.append(self)
     while (processedRules < Rule.numRules):
-      currentRule = (rule)rules[processedRules]
+      currentRule = rules[processedRules]#(rule)rules[processedRules]
       text = text + " " + currentRule.count + "\tR" + processedRules + " -> "
       sym = currentRule.first()
       # modified original for loop; need to do rule tracing with while loop
       while((sym is not None) or (not sym.isGuard())):
         if(sym.isNonTerminal()):
-          referedToRule = ((nonTerminal)sym).r
-          if ((Rule.numRules > referedToRule.index) and ((rule)rules[referedToRule.index] == referedToRule)):
+          referedToRule = sym.r#((nonTerminal)sym).r
+          if ((Rule.numRules > referedToRule.index) and (rules[referedToRule.index] == referedToRule)):
             index = referedToRule.index
           else:
             index = Rule.numRules
