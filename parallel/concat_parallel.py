@@ -7,6 +7,7 @@ import math
 input_string = "abracadabraarbadacarba"
 num_rules = 0
 
+# check for digram utility
 def digram_utility(rules_so_far):
     # find last digram created
     last_digram = rules_so_far['0'][-2:]
@@ -28,7 +29,6 @@ def digram_utility(rules_so_far):
         return False, rules_so_far
 
 # check for rule utility
-
 def rule_utility(rules_so_far):
     for rule in [a for a in rules_so_far.keys() if a <> '0']:
         # count how many times each rule besides the main string is used
@@ -51,6 +51,59 @@ def make_test():
     rules['1'] = 'aa'
     rules['2'] = '1b'
     return rules
+
+def replace(ruleset):
+    
+    rulenum = chr(65) # corresponds to 'A', can move to 40 for more rule names. max out at 96 (97 -> 'a')
+    
+    # update each set
+    for set in ruleset:
+        # store rule updates
+        updateset = {}
+        # get each k,v.
+        for k,v in set.items():
+            if k != '0':                
+                # store old rule name for replace
+                oldrule = k
+                # save for later
+                updateset[oldrule] = rulenum
+                # save the renamed rule
+                set[rulenum] = v
+                # remove the old rule
+                set.pop(k)
+                # update rulenum
+                rulenum = chr(ord(rulenum) + 1)
+        #print updateset
+        # perform the update
+        for k,v in set.items():
+            # check each renaming pair
+            for old,new in updateset.items():
+                #print "replacing: %s/%s" % (old, new)
+                # update rule
+                v = v.replace(old,new)
+            # place update rule back in set
+            set[k] = v
+    return ruleset
+
+# destructively merge all rulesets
+def merge(ruleset):
+	masterset = {}
+	# find all rule '0' and merge them.
+	stringMaster = ''
+	for set in ruleset:
+		r = set['0']
+		stringMaster = stringMaster + r
+		set.pop('0')
+	
+	# push rule '0' into masterset
+	masterset['0'] = stringMaster
+	
+	# push remaining rules into masterset
+	for set in ruleset:
+		for k,v in set.items():
+			masterset[k] = v
+	
+	return masterset
 
 def run_sequitur(strblock):
     
@@ -121,7 +174,7 @@ def parallel_sequitur(data, comm):
 
     return cummulative_ruleset
 
-def recombine(list_of_grammars):
+#def recombine(list_of_grammars):
     #final_ruleset = {}
     #for grammar in list_of_grammars:
       
