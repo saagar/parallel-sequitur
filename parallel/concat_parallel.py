@@ -169,7 +169,7 @@ def parallel_sequitur(data, comm):
       # rank 0 should receive all data
       for i in xrange(1, size):
         received = comm.recv(source=i)
-        print received
+        #print received
         cummulative_ruleset.append(received)
 
     return cummulative_ruleset
@@ -202,10 +202,17 @@ def main():
     # recombine all the rules
     if rank == 0:
       print cummulative_ruleset
-      final_ruleset = {}
-      numrules = 0
-      #for set in cummulative_ruleset:
-        
+      newrules = replace(cummulative_ruleset)
+      masterrules = merge(newrules)
+      print masterrules
+      print "Cleaning up with utility rules"
+      # run clean up
+      digram_bool, rule_bool = False, False
+      while not digram_bool:
+        digram_bool, masterrules = digram_utility(masterrules)
+      while not rule_bool:
+        rule_bool, masterrules = rule_utility(masterrules)
+      print masterrules
 
 if __name__ == "__main__":
     main()
