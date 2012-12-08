@@ -7,8 +7,8 @@ import math
 input_string = "abracadabraarbadacarba"
 num_rules = 0
 
-#input_file = "books/ParadiseLost.txt"
-input_file = "books/KingJamesBible.txt"
+input_file = "books/ParadiseLost.txt"
+#input_file = "books/KingJamesBible.txt"
 
 def slave(comm):
 
@@ -78,23 +78,115 @@ def master(comm):
             else:
                 master_wc[k] += v
 
+    f.close()
     return master_wc
 
+def parallel_sequitur(full_list, comm, rules):
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+
+    #print str(rank) + "has rules:" + str(rules)
+
+    if rank == 0:
+        # compute list size for children
+        blocksize = len(full_list)/size
+        for i in xrange(1,size):
+            data_block = full_list[blocksize*i:blocksize*(i+1)]
+            comm.send(data_block, dest = i)
+        data_block = full_list[0:blocksize]
+    else:
+        # all processes will receive data
+        received = comm.recv(source = 0)
+        data_block = received
+
+    # apply rules to set
+    for i in range(len(data_block)):
+        if data_block[i] in rules:
+            data_block[i] = rules[data_block[i]]
+    #for word in data_block:
+    #    if word in rules:
+    #        word = rules[word]
+
+    cummulative_text = []
+    # need to send all data back to rank 0
+    if rank != 0:
+        comm.send(data_block, dest=0)
+    else:
+        # rank 0 should append its own data
+        cummulative_text.append(data_block)
+        # rank 0 should receive all data
+        for i in xrange(1,size):
+            received = comm.recv(source=i)
+            #print "from rank: " + str(i) + " received: " + str(received)
+            cummulative_text.append(received)
+
+    return cummulative_text
 
 def main():
     
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
+    size = comm.Get_size()
 
     # master process will start the slaves
     if rank == 0:
         start_time = MPI.Wtime()
         wordcount = master(comm)
         end_time = MPI.Wtime()
-        print wordcount
+       # print wordcount
         print "Time: %f secs" % (end_time - start_time)
     else:
         slave(comm)
-    
+ 
+    rule_num = 1
+    # used for faster replacing
+    wordtoruleset = {}
+    # used for decoding/output
+    ruletowordset = {}
+    # some stats
+    totalchars = 0
+    totalrulesize = 0
+    # generate the rules from the count dictionary
+    if rank == 0:
+        for k, v in wordcount.items():
+            if v > 1:
+                rule = '@' + str(rule_num) + '@'
+                wordtoruleset[k] = rule
+                ruletowordset[rule] = k
+                rule_num += 1
+                totalchars += len(k)
+                totalrulesize += len(rule)
+        print wordtoruleset
+        print totalchars
+        print totalrulesize
+        ruleset_compression = (totalchars - totalrulesize)/(float(totalchars))
+        print "Compression of %f if all rules used once" % (ruleset_compression*100)
+        
+    # master process will start the slaves again
+   
+    full_list = []
+
+    if rank == 0:
+        f = open(input_file,'r')
+        filebuf = f.read()
+        #print filebuf
+        full_list = filebuf.split()
+        #print full_list
+        # send rules to other processes
+        for i in xrange(1, size):
+            comm.send(wordtoruleset,dest = i)
+    else:
+        # receive the rules
+        wordtoruleset = comm.recv(source = 0)
+
+    comm.barrier()
+    compressed_text = parallel_sequitur(full_list,comm,wordtoruleset)
+    comm.barrier()
+
+    if rank == 0:
+       print compressed_text
+       #pass
+
+
 if __name__ == "__main__":
     main()
