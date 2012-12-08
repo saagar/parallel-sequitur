@@ -105,7 +105,7 @@ def merge(ruleset):
 	
 	return masterset
 
-def run_sequitur(strblock):
+def run_sequitur(strblock,comm):
 
     rank = comm.Get_rank()
     size = comm.Get_size()
@@ -117,27 +117,42 @@ def run_sequitur(strblock):
     rule_bool = False
 
     for x in range(len(strblock)):
-      digram_bool = False
-      rule_bool = False
-      string_so_far = strblock[:x]
-      rules['0'] = rules['0'] + strblock[x]
-      while not digram_bool:
-        digram_bool, rules, newrule = digram_utility(rules)
-        newrule = newrule + (rank,) # triple of (rule name, rule, rank)
-        if not digram_bool:
-          # TODO!!!!
-          gatheredrules = comm.allgather(newrule)
-          for (name, rule, rulerank) in gatheredrules:
-            if rulerank != rank:
-              # TODO!!!!
-              # add the rule, we haven't seen it before
-              pass
-              # check if rule name is unique
+        digram_bool = False
+        rule_bool = False
+        string_so_far = strblock[:x]
+        rules['0'] = rules['0'] + strblock[x]
+        while not digram_bool:
+            digram_bool, rules, newrule = digram_utility(rules)
+            newrule = newrule + (rank,) # triple of (rule name, rule, rank)
+            if not digram_bool:
+                gatheredrules = comm.allgather(newrule)
+                for (name, rule, rulerank) in gatheredrules:
+                    print str(rank) + " has rule %s -> %s" % (name, rule)
+                    # add the rule, we haven't seen it before
+                    if rulerank != rank:
+                        # check if rule name is unique
+                        if not name in rules:
+                            rules[name] = rule
+                        else:
+                        # put in temporary rule @, we'll need to rename after
+                            rules['@'] = rule
 
-          pass
-      while not rule_bool:
-        rule_bool, rules = rule_utility(rules)
-  
+            # apply rule utility on updated set
+            #while not rule_bool:
+            #    rule_bool, rules = rule_utility(rules)
+
+                print str(rank) + "(premerge): " + str(rules)
+                set = [rules]
+                set = replace(set)      
+                rules = merge(set)
+                print str(rank) + "(post): " + str(rules)
+
+
+    # last round on all rules
+    #while not rule_bool:
+    #    rule_bool, rules = rule_utility(rules)
+    
+    print str(rank) + ": " + str(rules)
     return rules
 
 def parallel_sequitur(data, comm):
@@ -163,14 +178,8 @@ def parallel_sequitur(data, comm):
       received = comm.recv(source=0)
       data_block = received
 
-    #print "pre seq"
-    #print rank
-    #print data_block
     # run sequitur here
-    rules = run_sequitur(data_block)
-    #print "post seq"
-    #print rank
-    #print rules
+    rules = run_sequitur(data_block,comm)
 
     # need to send all data back to rank 0
     if rank != 0:
@@ -191,25 +200,15 @@ def main():
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     
-"""
-    # master process will start slaves
-    if rank == 0:
-      start_time = MPI.Wtime()
-      C = master(comm, data)
-      end_time = MPI.Wtime()
-      #print "Time: %f secs" % (end_time - start_time)
-    else:
-      slave(comm)
-"""
     # MOVE THIS
-    THRESHOLD = 1
+    #THRESHOLD = 1
   
     if rank == 0:
-      # process 0 gets all the data first
-      data = input_string # need to change this to open an input file
+        # process 0 gets all the data first
+        data = input_string # need to change this to open an input file
     else:
-      # other processes don't get anything until rank 0 sends it
-      data = None
+        # other processes don't get anything until rank 0 sends it
+        data = None
 
     # comm barrier to wait for all results to be completed calculated
     comm.barrier()
@@ -217,7 +216,9 @@ def main():
     cummulative_ruleset = parallel_sequitur(data,comm)
     comm.barrier()
     
-    print "out of barrier..."
+    print cummulative_ruleset
+
+    """
 
     # recombine all the rules
     if rank == 0:
@@ -233,6 +234,6 @@ def main():
       while not rule_bool:
         rule_bool, masterrules = rule_utility(masterrules)
       print masterrules
-
+    """
 if __name__ == "__main__":
     main()
