@@ -3,6 +3,9 @@ import collections
 import re
 import csv
 import time
+from mpi4py import MPI
+import numpy as np
+import math
 
 def rule_utility(rules_so_far, rule_list):
     for rule in [a for a in rules_so_far.keys() if a <> '0']:
@@ -266,7 +269,7 @@ def parallel_sequitur(data, comm):
     if rank == 0:
         strsize = len(data)/size
         for i in xrange(1,size):
-            data_block= data[strsize*i:strisize*(i+1)]
+            data_block= data[strsize*i:strsize*(i+1)]
             comm.send(data_block, dest=i)
         data_block = data[0:strsize]
     else:
@@ -281,6 +284,7 @@ def parallel_sequitur(data, comm):
         for i in xrange(1,size):
             received = comm.recv(source=i)
             cummulative_ruleset.append(received)
+    return cummulative_ruleset
 
 def main():
     comm = MPI.COMM_WORLD
@@ -312,15 +316,19 @@ def main():
     # recombine all the rules
     if rank == 0:
         unused_rules = []
-        combined = merge_and_replace(cummulative_ruleset)
+        masterrules = merge_and_replace(cummulative_ruleset)
         digram_bool, rule_bool = False, False
         while not digram_bool or not rule_bool:
             digram_bool, masterrules = digram_uniqueness(masterrules)
             rule_bool, masterrules, unused_rules = rule_utility(masterrules, unused_rules)            
-                
+
+        output_file = input_file.split('.')[0]+'_grammar.csv'
         writer = csv.writer(open(output_file, 'wb'))
-        for key, value in rules_so_far.items():
+        for key, value in masterrules.items():
             writer.writerow([key, value])
+        output_string = input_file.split('.')[0]+'_mainstring.txt'
+        writer2 = open(output_string, 'wb')
+        writer2.write(masterrules['0'])
 ###         g.write(rules_so_far)
 
     
