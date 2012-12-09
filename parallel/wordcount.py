@@ -7,8 +7,8 @@ import math
 input_string = "abracadabraarbadacarba"
 num_rules = 0
 
-input_file = "books/ParadiseLost.txt"
-#input_file = "books/KingJamesBible.txt"
+#input_file = "books/ParadiseLost.txt"
+input_file = "books/KingJamesBible.txt"
 
 def slave(comm):
 
@@ -117,6 +117,7 @@ def parallel_sequitur(full_list, comm, rules):
         # rank 0 should receive all data
         for i in xrange(1,size):
             received = comm.recv(source=i)
+            print "received compressed from rank: " + str(i)
             #print "from rank: " + str(i) + " received: " + str(received)
             cummulative_text.append(received)
 
@@ -143,9 +144,41 @@ def main():
     wordtoruleset = {}
     # used for decoding/output
     ruletowordset = {}
-    # some stats
+    # some vars for stats
     totalchars = 0
     totalrulesize = 0
+
+    rulestomake = []
+
+    # some optimizations
+    # prune the count dictionary. remove all items smaller than 3 chars
+    # also, reorder. give smallest words the smallest rule names
+    if rank == 0:
+         # get all word we want from dict and put them in a list
+        for k,v in wordcount.items():
+            if v > 1 and len(k) > 2:
+                # add word to list
+                rulestomake.append(k)
+        # sort the words we want by length
+        rulestomake.sort(key=len)
+        #print rulestomake
+
+    # generate the rules from the count dictionary
+    if rank == 0:
+        for item in rulestomake:
+            rule = '@' + str(rule_num) + '@'
+            wordtoruleset[item] = rule
+            ruletowordset[rule] = item
+            rule_num += 1
+            totalchars += len(k)
+            totalrulesize += len(rule)
+        #print wordtoruleset
+        print "Total Chars: " + str(totalchars)
+        print "Total Rule Size: " + str(totalrulesize)
+        # calculate our rough stats. not very meaningful unless we analyze all differences
+        ruleset_compression = (totalchars - totalrulesize)/(float(totalchars))
+        print "Compression of %f if all rules used once" % (ruleset_compression*100)
+    """
     # generate the rules from the count dictionary
     if rank == 0:
         for k, v in wordcount.items():
@@ -156,16 +189,17 @@ def main():
                 rule_num += 1
                 totalchars += len(k)
                 totalrulesize += len(rule)
-        print wordtoruleset
-        print totalchars
-        print totalrulesize
+        #print wordtoruleset
+        print "Total Chars: " + str(totalchars)
+        print "Total Rule Size: " + str(totalrulesize)
+        # calculate our rough stats. not very meaningful unless we analyze all differences
         ruleset_compression = (totalchars - totalrulesize)/(float(totalchars))
         print "Compression of %f if all rules used once" % (ruleset_compression*100)
-        
-    # master process will start the slaves again
-   
+    """ 
+     
     full_list = []
-
+    
+    # rank 0 will get the input
     if rank == 0:
         f = open(input_file,'r')
         filebuf = f.read()
@@ -180,11 +214,23 @@ def main():
         wordtoruleset = comm.recv(source = 0)
 
     comm.barrier()
+    # run a basic concat-sequitur
     compressed_text = parallel_sequitur(full_list,comm,wordtoruleset)
     comm.barrier()
 
     if rank == 0:
-       print compressed_text
+        mastercompressedstr = ''
+        # combine all compressions together
+        for x in compressed_text:
+            mastercompressedstr += ' '.join(map(str,x)) + " "
+        #print mastercompressedstr
+        # save to file
+        out = open("wcOUT.txt","w")
+        out.write(mastercompressedstr + '\n')
+        for k,v in ruletowordset.items():
+            out.write(k+": " + v + '\n')
+        out.close()
+       #print compressed_text
        #pass
 
 
