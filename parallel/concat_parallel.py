@@ -7,40 +7,49 @@ from mpi4py import MPI
 import numpy as np
 import math
 
+# helper function to enforce rule utility
 def rule_utility(rules_so_far, rule_list):
+
     for rule in [a for a in rules_so_far.keys() if a <> '0']:
         # count how many times each rule besides the main string is used
         count = 0
         other_keys = [a for a in rules_so_far.keys() if rule <> a]
         for key in other_keys:
             count += rules_so_far[key].count(rule)
+
         # if rule is only used once, consolidate
         if count < 2:
             for key in other_keys:
                 rules_so_far[key] = rules_so_far[key].replace('@'+rule+'@', rules_so_far[rule])
             del rules_so_far[rule]
             rule_list.append(rule)
-            # print "deleted rule" + rule
+
+            # return false flag to ensure that all rules have been properly caught
             return False, rules_so_far, rule_list
+        
+    # after one clean time through, done!
     return True, rules_so_far, rule_list
 
+# helper function to find last symbol
 def last_symbol(test_string):
-    place_holder = -1
+    # if a letter, return letter
     if input_str[-1] != '@':
         result = input_str[-1]
     else:
-        # if it is, find the other end of rule
+        # find the other end of rule
         place_holder = -2
         while input_str[place_holder] != '@':
             place_holder -= 1
         result = input_str[place_holder:]
     return result
 
+# helper function to find first symbol
 def first_symbol(test_string):
+    # if a letter, return letter
     if input_str[0] != '@':
         result = input_str[0]
     else:
-        # if it is, find the other end of rule
+        # find the other end of rule
         place_holder = 1
         while input_str[place_holder] != '@':
             place_holder += 1
@@ -50,13 +59,16 @@ def first_symbol(test_string):
 def digram_uniqueness(rules):
     # find target digram
     last_digram = ''.join(last_two_symbols(rules['0']))
+
     count = 0
     # count how many times it appears in the grammar beforehand
     for key in rules.keys():
         count += rules[key].count(last_digram)
+
     if count == 1:
         # if exactly once, done!
         return True, rules
+
     else:
         # otherwise, create a new rule for this digram
         global num_rules
@@ -74,54 +86,39 @@ def merge_and_replace(list_of_grammars):
 
     # re-number all rules for all grammars in list of grammars
     for grammar in list_of_grammars:
-        # print grammar
+        
         all_rules = [a for a in grammar.keys() if a != '0']
-        # print all_rules
+        
         # for each rule, if the actual rule hasn't been seen before
         for x in all_rules:
-            # print "on rule" + x + " = "+ grammar[x]
-            # print "testing whether " + grammar[x] + " in back_dict"
+            # create new rule and insert into record
             if not grammar[x] in back_dict.keys():
-                # print back_dict
-                # print grammar[x]+"not in back_dict"
                 num_rules += 1
-                # print "num_rules now "+str(num_rules)
                 # re-number rule and add to list of rules that have been seen before
-                # grammar[str(num_rules)] = grammar[x]
                 grammar['0'] = grammar['0'].replace('@'+x+'@', '@'+str(num_rules)+'@')
-                # print "grammar[0] is now " + grammar['0'] + ", replaced "+ x + " with" + str(num_rules)
                 back_dict[grammar[x]] = str(num_rules)
                 masterset[str(num_rules)] = grammar[x]
-                # print "back_dict"
-                # print back_dict
-                # print "masterset"
-                # print masterset
-            else:
-                # if the rule has been seen before, rewrite grammar accordingly
-                # print back_dict
-                # print grammar[x] + " in back_dict"
-                rule_to_use = back_dict[masterset[x]]
-                grammar['0'].replace(x, str(rule_to_use))
-                grammar[rule_to_use] = grammar[x]
-                # print "deleted"
-                # print grammar[x]
-                del grammar[x]
-        # print "finished"
-        # print grammar
-        # print masterset
-    
 
-    # # find all rules '0' and merge them
+            else:
+                # if the rule has been seen before
+                rule_to_use = back_dict[masterset[x]]
+                # use previous rule to rewrite main string
+                grammar['0'].replace(x, str(rule_to_use))
+                # save accordingly
+                grammar[rule_to_use] = grammar[x]
+
+    # find all rules '0' and merge them
     stringMaster = ''
     for grammar in list_of_grammars:
         stringMaster = stringMaster + grammar['0']
     
     # push rule '0' into masterset
     masterset['0'] = stringMaster
-    return masterset
-    # push remaining rules into 
-        
 
+    # done! pat yourself on the back and return masterset
+    return masterset
+
+# testing function
 def make_test():
     rule1 = {}
     rule1['0'] = '@1@@3@@2@@1@@2@@3@'
@@ -173,23 +170,23 @@ def non_overlap(list_of_ranges, target_range):
         if not (list(set(xrange(a,b)) & set(xrange(t1,t2))) != []):
             overlapping_ranges.append(x)
     return overlapping_ranges
-            
-def run_sequitur(input_string):
-    # initialize semi-global values
-    num_rules = 0
-    digram_bool = False
-    rule_bool = False
-    unused_rules = []
-    
-    rules_so_far={}
-    rules_so_far['0'] = '' # '@13@abd@13@akjkdf@13@a'
 
+# very similar to serial implementation in serial.py
+def run_sequitur(input_string):
+
+    # initialize values
+    num_rules = 0
+    unused_rules = []
+    rules_so_far={}
+    rules_so_far['0'] = ''
+
+    # serially iterate over all letters in string
     for i in range(len(input_string)):
         rules_so_far['0'] = rules_so_far['0'] + input_string[i]
         penult_symbol, last_symbol = last_two_symbols(rules_so_far['0'])
         last_digram = penult_symbol + last_symbol
         # determine if new digram is repeated elsewhere and repetitions do not overlap
-        string_occurrences = last_digram in rules_so_far['0'][:-1] #all_occurrences(last_digram, rules_so_far['0'][:-1])
+        string_occurrences = last_digram in rules_so_far['0'][:-1] 
         all_rules = [a for a in rules_so_far.keys() if  '0' != a]
         
         # build rule_occurrences
@@ -287,14 +284,21 @@ def parallel_sequitur(data, comm):
     return cummulative_ruleset
 
 def main():
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    size = comm.Get_size()
-    
+    # correct usage if necessary
     if len(sys.argv) != 2:
         if rank == 0:
             print "Usage: concat_parallel.py filename.txt"
         return 1
+    
+    # set up MPI
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+
+    # set up file names
+    input_file = sys.arv[1]
+    output_file = input_file.split('.')[0]+'_grammar.csv'
+    mainstring_file = input_file.split('.')[0]+'_mainstring.txt'
 
     if rank == 0:
         # process 0 gets all data first
@@ -329,13 +333,9 @@ def main():
         output_string = input_file.split('.')[0]+'_mainstring.txt'
         writer2 = open(output_string, 'wb')
         writer2.write(masterrules['0'])
-###         g.write(rules_so_far)
+    return 0
 
-    
-    # input_file = sys.argv[1] 
-    # output_file = (input_file.split('.')[0])+'_grammar.csv'
-
-def notmain():
+def testing():
     testlist = make_test()
     result = merge_and_replace(testlist)
     unused_rules = []
