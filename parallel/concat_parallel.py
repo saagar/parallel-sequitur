@@ -1,35 +1,10 @@
 import sys
 import collections
-from mpi4py import MPI
-import numpy as np
-import math
+import re
+import csv
+import time
 
-input_string = "abracadabraarbadacarba"
-num_rules = 0
-
-# check for digram utility
-def digram_utility(rules_so_far):
-    # find last digram created
-    last_digram = rules_so_far['0'][-2:]
-    count = 0
-    # count how many times it appears in the grammar beforehand
-    for key in rules_so_far.keys():
-        count += rules_so_far[key].count(last_digram)
-    #print count
-    if count == 1:
-        # if exactly once, done!
-        return True, rules_so_far
-    else:
-        # otherwise, create a new rule for this digram
-        global num_rules
-        num_rules += 1
-        for x in rules_so_far.keys():
-            rules_so_far[x] = rules_so_far[x].replace(last_digram, str(num_rules))
-            rules_so_far[str(num_rules)] = last_digram
-        return False, rules_so_far
-
-# check for rule utility
-def rule_utility(rules_so_far):
+def rule_utility(rules_so_far, rule_list):
     for rule in [a for a in rules_so_far.keys() if a <> '0']:
         # count how many times each rule besides the main string is used
         count = 0
@@ -39,180 +14,328 @@ def rule_utility(rules_so_far):
         # if rule is only used once, consolidate
         if count < 2:
             for key in other_keys:
-                rules_so_far[key] = rules_so_far[key].replace(rule, rules_so_far[rule])
+                rules_so_far[key] = rules_so_far[key].replace('@'+rule+'@', rules_so_far[rule])
             del rules_so_far[rule]
-            return False, rules_so_far
-    return True, rules_so_far
+            rule_list.append(rule)
+            # print "deleted rule" + rule
+            return False, rules_so_far, rule_list
+    return True, rules_so_far, rule_list
 
-# test cases
+def last_symbol(test_string):
+    place_holder = -1
+    if input_str[-1] != '@':
+        result = input_str[-1]
+    else:
+        # if it is, find the other end of rule
+        place_holder = -2
+        while input_str[place_holder] != '@':
+            place_holder -= 1
+        result = input_str[place_holder:]
+    return result
+
+def first_symbol(test_string):
+    if input_str[0] != '@':
+        result = input_str[0]
+    else:
+        # if it is, find the other end of rule
+        place_holder = 1
+        while input_str[place_holder] != '@':
+            place_holder += 1
+        result = input_str[place_holder:]
+    return result
+
+def digram_uniqueness(rules):
+    # find target digram
+    last_digram = ''.join(last_two_symbols(rules['0']))
+    count = 0
+    # count how many times it appears in the grammar beforehand
+    for key in rules.keys():
+        count += rules[key].count(last_digram)
+    if count == 1:
+        # if exactly once, done!
+        return True, rules
+    else:
+        # otherwise, create a new rule for this digram
+        global num_rules
+        num_rules += 1
+        for x in rules.keys():
+            rules[x] = rules[x].replace(last_digram, str(num_rules))
+            rules[str(num_rules)] = last_digram
+        return False, rules_so_far
+
+def merge_and_replace(list_of_grammars):
+    masterset = {}
+    back_dict = {}
+
+    num_rules = 0
+
+    # re-number all rules for all grammars in list of grammars
+    for grammar in list_of_grammars:
+        # print grammar
+        all_rules = [a for a in grammar.keys() if a != '0']
+        # print all_rules
+        # for each rule, if the actual rule hasn't been seen before
+        for x in all_rules:
+            # print "on rule" + x + " = "+ grammar[x]
+            # print "testing whether " + grammar[x] + " in back_dict"
+            if not grammar[x] in back_dict.keys():
+                # print back_dict
+                # print grammar[x]+"not in back_dict"
+                num_rules += 1
+                # print "num_rules now "+str(num_rules)
+                # re-number rule and add to list of rules that have been seen before
+                # grammar[str(num_rules)] = grammar[x]
+                grammar['0'] = grammar['0'].replace('@'+x+'@', '@'+str(num_rules)+'@')
+                # print "grammar[0] is now " + grammar['0'] + ", replaced "+ x + " with" + str(num_rules)
+                back_dict[grammar[x]] = str(num_rules)
+                masterset[str(num_rules)] = grammar[x]
+                # print "back_dict"
+                # print back_dict
+                # print "masterset"
+                # print masterset
+            else:
+                # if the rule has been seen before, rewrite grammar accordingly
+                # print back_dict
+                # print grammar[x] + " in back_dict"
+                rule_to_use = back_dict[masterset[x]]
+                grammar['0'].replace(x, str(rule_to_use))
+                grammar[rule_to_use] = grammar[x]
+                # print "deleted"
+                # print grammar[x]
+                del grammar[x]
+        # print "finished"
+        # print grammar
+        # print masterset
+    
+
+    # # find all rules '0' and merge them
+    stringMaster = ''
+    for grammar in list_of_grammars:
+        stringMaster = stringMaster + grammar['0']
+    
+    # push rule '0' into masterset
+    masterset['0'] = stringMaster
+    return masterset
+    # push remaining rules into 
+        
+
 def make_test():
-    rules = {}
-    rules['0'] = '22'
-    rules['1'] = 'aa'
-    rules['2'] = '1b'
-    return rules
+    rule1 = {}
+    rule1['0'] = '@1@@3@@2@@1@@2@@3@'
+    rule1['1'] = 'aa'
+    rule1['2'] = 'ab'
+    rule1['3'] = 'cb'
 
-def replace(ruleset):
-    
-    rulenum = chr(65) # corresponds to 'A', can move to 40 for more rule names. max out at 96 (97 -> 'a')
-    
-    # update each set
-    for set in ruleset:
-        # store rule updates
-        updateset = {}
-        # get each k,v.
-        for k,v in set.items():
-            if k != '0':                
-                # store old rule name for replace
-                oldrule = k
-                # save for later
-                updateset[oldrule] = rulenum
-                # save the renamed rule
-                set[rulenum] = v
-                # remove the old rule
-                set.pop(k)
-                # update rulenum
-                rulenum = chr(ord(rulenum) + 1)
-        #print updateset
-        # perform the update
-        for k,v in set.items():
-            # check each renaming pair
-            for old,new in updateset.items():
-                #print "replacing: %s/%s" % (old, new)
-                # update rule
-                v = v.replace(old,new)
-            # place update rule back in set
-            set[k] = v
-    return ruleset
+    rule2 = {}
+    rule2['0'] = '@3@@1@@2@@2@@1@@3@'
+    rule2['1'] = 'ac'
+    rule2['2'] = 'aa'
+    rule2['3'] = 'ba'
+    return [rule1, rule2]
 
-# destructively merge all rulesets
-def merge(ruleset):
-	masterset = {}
-	# find all rule '0' and merge them.
-	stringMaster = ''
-	for set in ruleset:
-		r = set['0']
-		stringMaster = stringMaster + r
-		set.pop('0')
-	
-	# push rule '0' into masterset
-	masterset['0'] = stringMaster
-	
-	# push remaining rules into masterset
-	for set in ruleset:
-		for k,v in set.items():
-			masterset[k] = v
-	
-	return masterset
+def last_two_symbols(input_str):
+    # if the input string is less than 2 characters long, just output
+    if len(input_str) < 2:
+        return '', input_str
 
-def run_sequitur(strblock):
-    
-    # set up initial params
-    rules = {}
-    rules['0'] = ''
+    # make sure last symbol isn't a rule
+    place_holder = -1
+    if input_str[-1] != '@':
+        last_symbol = input_str[-1]
+    else:
+        # if it is, find the other end of rule
+        place_holder = -2
+        while input_str[place_holder] != '@':
+            place_holder -= 1
+        last_symbol = input_str[place_holder:]
+    # repeat for second to last symbol
+    place_holder2 = place_holder - 1
+    if input_str[place_holder2] != '@':
+        penultimate_symbol = input_str[place_holder2:place_holder]
+    else:
+        place_holder2 -= 1
+        while input_str[place_holder2] != '@':
+            place_holder2 -= 1
+        penultimate_symbol = input_str[place_holder2:place_holder]
+    return penultimate_symbol, last_symbol
+
+def all_occurrences(digram, search_string):
+    return [(a.start(), a.end()) for a in list(re.finditer(digram, search_string))]
+
+def non_overlap(list_of_ranges, target_range):
+    t1, t2 = target_range
+    overlapping_ranges = []
+    for x in list_of_ranges:
+        a,b = x
+        if not (list(set(xrange(a,b)) & set(xrange(t1,t2))) != []):
+            overlapping_ranges.append(x)
+    return overlapping_ranges
+            
+def run_sequitur(input_string):
+    # initialize semi-global values
+    num_rules = 0
     digram_bool = False
     rule_bool = False
+    unused_rules = []
+    
+    rules_so_far={}
+    rules_so_far['0'] = '' # '@13@abd@13@akjkdf@13@a'
 
-    for x in range(len(strblock)):
-      digram_bool = False
-      rule_bool = False
-      string_so_far = strblock[:x]
-      rules['0'] = rules['0'] + strblock[x]
-      while not digram_bool:
-        digram_bool, rules = digram_utility(rules)
-      while not rule_bool:
-        rule_bool, rules = rule_utility(rules)
-  
-    return rules
+    for i in range(len(input_string)):
+        rules_so_far['0'] = rules_so_far['0'] + input_string[i]
+        penult_symbol, last_symbol = last_two_symbols(rules_so_far['0'])
+        last_digram = penult_symbol + last_symbol
+        # determine if new digram is repeated elsewhere and repetitions do not overlap
+        string_occurrences = last_digram in rules_so_far['0'][:-1] #all_occurrences(last_digram, rules_so_far['0'][:-1])
+        all_rules = [a for a in rules_so_far.keys() if  '0' != a]
+        
+        # build rule_occurrences
+        rule_occurrences = []
+        for x in all_rules:
+            if last_digram in rules_so_far[x]:
+                if rules_so_far[x] == last_digram:
+                    rule_occurrences.append((x,True))
+                else:
+                    rule_occurrences.append((x,False))
 
+        # if the new digram is repeated elsewhere and nonoverlapping
+        if (rule_occurrences != []) or (string_occurrences):
+            for x in rule_occurrences:
+                rule_num, entire_bool = x
+                # if this occurrence is a complete rule, enforce rule
+                if entire_bool:
+                    # replace new digram with corresponding rule
+                    rules_so_far['0'] = rules_so_far['0'].replace(last_digram, '@'+rule_num+'@')
+                    rule_utility_bool = False
+                    while not rule_utility_bool:
+                        rule_utility_bool, rules_so_far, unused_rules = rule_utility(rules_so_far, unused_rules)
+                else:
+                    # otherwise create new rule and replace inside other rule
+                    if unused_rules == []:
+                        # if there are no unused rules, increment num_rules
+                        num_rules += 1
+                        rules_so_far[str(num_rules)] = last_digram
+                        rules_so_far[rule_num] = rules_so_far[rule_num].replace(last_digram, '@'+str(num_rules)+'@')
+                        # print "added"+str(num_rules)
+                    else:
+                        # otherwise, reuse one of the unused rule numbers
+                        new_num = unused_rules.pop(0)
+                        rules_so_far[new_num] = last_digram
+                        try:
+                            rules_so_far[rule_num] = rules_so_far[rule_num].replace(last_digram, '@'+new_num+'@')
+                        except:
+                            for x in [a for a in rules_so_far.keys() if  '0' != a]:
+                                rules_so_far[x] = rules_so_far[x].replace(last_digram, '@'+new_num+'@')
+                    rule_utility_bool = False
+                    while not rule_utility_bool:
+                        rule_utility_bool, rules_so_far, unused_rules = rule_utility(rules_so_far, unused_rules)      
+            # if digram repeats in string, create new rule and enforce
+            if string_occurrences:
+                if unused_rules == []:
+                    num_rules += 1
+                    rules_so_far[str(num_rules)] = last_digram
+                    rules_so_far['0'] = rules_so_far['0'].replace(last_digram, '@'+str(num_rules)+'@')
+                    # print "added"+str(num_rules)
+                else:
+                    new_num = unused_rules.pop(0)
+                    rules_so_far[str(new_num)] = last_digram
+                    rules_so_far['0'] = rules_so_far['0'].replace(last_digram, '@'+new_num+'@')
+                    # print "added"+new_num
+                rule_utility_bool = False
+                while not rule_utility_bool:
+                    rule_utility_bool, rules_so_far, unused_rules = rule_utility(rules_so_far, unused_rules)
+    return rules_so_far
+    # end = time.time()
+    
+    # print rules_so_far
+
+    # # write rules into file
+    # writer = csv.writer(open('mainstring.txt', 'wb'))
+    # writer.writerow(rules_so_far['0'])
+    
+    # print "time: %f s" % (end - start)
+    
 def parallel_sequitur(data, comm):
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    # store rules from each process
+    # store rules for each process and total
     rules = {}
-
-    # need this to store all results after parallel is done
     cummulative_ruleset = []
-
+    
     if rank == 0:
-      # string size for children
-      strsize = len(data)/size
-      for i in xrange(1,size):
-        data_block = data[strsize*i:strsize*(i+1)]
-        #print "sending: " + data_block
-        comm.send(data_block, dest = i)
-      data_block = data[0:strsize]
+        strsize = len(data)/size
+        for i in xrange(1,size):
+            data_block= data[strsize*i:strisize*(i+1)]
+            comm.send(data_block, dest=i)
+        data_block = data[0:strsize]
     else:
-      # all processes will receive data
-      received = comm.recv(source=0)
-      #print "received: " + received
-      data_block = received
-      #print str(rank) + "is receiving:"
-      #print data_block
-
-    #print "pre seq"
-    #print rank
-    #print data_block
-    # run sequitur here
+        received = comm.recv(source=0)
+        data_block = received
     rules = run_sequitur(data_block)
-    #print "post seq"
-    #print rank
-    #print rules
 
-    # need to send all data back to rank 0
     if rank != 0:
-      comm.send(rules, dest=0)
+        comm.send(rules, dest=0)
     else:
-      # rank 0 should append its own data
-      cummulative_ruleset.append(rules)
-      # rank 0 should receive all data
-      for i in xrange(1, size):
-        received = comm.recv(source=i)
-        #print received
-        cummulative_ruleset.append(received)
-
-    return cummulative_ruleset
-
-#def recombine(list_of_grammars):
-    #final_ruleset = {}
-    #for grammar in list_of_grammars:
-      
+        cummulative_ruleset.append(rules)
+        for i in xrange(1,size):
+            received = comm.recv(source=i)
+            cummulative_ruleset.append(received)
 
 def main():
-    
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
+    size = comm.Get_size()
+    
+    if len(sys.argv) != 2:
+        if rank == 0:
+            print "Usage: concat_parallel.py filename.txt"
+        return 1
 
     if rank == 0:
-      # process 0 gets all the data first
-      data = input_string # need to change this to open an input file
+        # process 0 gets all data first
+        input_file = sys.argv[1]
+        f = open('books/'+input_file, 'rb')
+        input_string = f.read()
+        data = input_string
     else:
-      # other processes don't get anything until rank 0 sends it
-      data = None
-
-    # comm barrier to wait for all results to be completed calculated
+        # all other processes don't get anything until rank 0 sends them it
+        data = None
+        
+    # comm barrier to wait for all results to be sent
     comm.barrier()
+        
     # run the parallel_sequitur driver
     cummulative_ruleset = parallel_sequitur(data,comm)
     comm.barrier()
-    
-    print "out of barrier..."
-
+        
     # recombine all the rules
     if rank == 0:
-      print cummulative_ruleset
-      newrules = replace(cummulative_ruleset)
-      masterrules = merge(newrules)
-      print masterrules
-      print "Cleaning up with utility rules"
-      # run clean up
-      digram_bool, rule_bool = False, False
-      while not digram_bool:
-        digram_bool, masterrules = digram_utility(masterrules)
-      while not rule_bool:
-        rule_bool, masterrules = rule_utility(masterrules)
-      print masterrules
+        unused_rules = []
+        combined = merge_and_replace(cummulative_ruleset)
+        digram_bool, rule_bool = False, False
+        while not digram_bool or not rule_bool:
+            digram_bool, masterrules = digram_uniqueness(masterrules)
+            rule_bool, masterrules, unused_rules = rule_utility(masterrules, unused_rules)            
+                
+        writer = csv.writer(open(output_file, 'wb'))
+        for key, value in rules_so_far.items():
+            writer.writerow([key, value])
+###         g.write(rules_so_far)
+
+    
+    # input_file = sys.argv[1] 
+    # output_file = (input_file.split('.')[0])+'_grammar.csv'
+
+def notmain():
+    testlist = make_test()
+    result = merge_and_replace(testlist)
+    unused_rules = []
+    digram_bool, rule_bool = False, False
+    while not digram_bool or not rule_bool:
+        digram_bool, testmaster = digram_uniqueness(result)
+        rule_bool, testmaster, unused_rules = rule_utility(result, unused_rules)
+    print result
 
 if __name__ == "__main__":
     main()
