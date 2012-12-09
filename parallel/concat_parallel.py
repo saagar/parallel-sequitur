@@ -327,11 +327,11 @@ def main():
             rule_bool, masterrules, unused_rules = rule_utility(masterrules, unused_rules)            
 
         output_file = input_file.split('.')[0]+'_grammar.csv'
-        writer = csv.writer(open(output_file, 'wb'))
+        writer = csv.writer(open('results/'+output_file, 'wb'))
         for key, value in masterrules.items():
             writer.writerow([key, value])
         output_string = input_file.split('.')[0]+'_mainstring.txt'
-        writer2 = open(output_string, 'wb')
+        writer2 = open('results/'+output_string, 'wb')
         writer2.write(masterrules['0'])
     return 0
 

@@ -162,11 +162,11 @@ def main():
     end = time.time()
     
     # write rules to output file
-    writer = csv.writer(open(output_file, 'wb'))
+    writer = csv.writer(open('results/'+output_file, 'wb'))
     for key, value in rules_so_far.items():
         writer.writerow([key, value])
 
-    writer = open(mainstring_file, 'wb')
+    writer = open('results/'+mainstring_file, 'wb')
     writer.write(rules_so_far['0'])
     
     print "time: %f s" % (end - start)
