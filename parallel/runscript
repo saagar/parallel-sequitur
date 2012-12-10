@@ -9,11 +9,11 @@
 # Shell environment
 #$ -S /bin/bash
 # Resonance queue system to use
-# If more than 5min job, use -q gpu.q
-#$ -q gpu-short.q
+# If more than 5min job, use -q gpu.q, for short use gpu-short.q
+#$ -q gpu.q
 # The number of processes to launch [1-32]
 # (Change the number)
-#$ -pe orte 4
+#$ -pe orte 16
 
 # Import environment and profile
 . /etc/profile

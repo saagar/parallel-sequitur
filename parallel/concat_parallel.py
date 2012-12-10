@@ -184,7 +184,6 @@ def run_sequitur(input_string, comm):
 
     # serially iterate over all letters in string
     for i in range(len(input_string)):
-        print "%d: iterates over %s" % (rank, i)
 
         rules_so_far['0'] = rules_so_far['0'] + input_string[i]
         penult_symbol, last_symbol = last_two_symbols(rules_so_far['0'])
@@ -220,7 +219,7 @@ def run_sequitur(input_string, comm):
                         num_rules += 1
                         rules_so_far[str(num_rules)] = last_digram
                         rules_so_far[rule_num] = rules_so_far[rule_num].replace(last_digram, '@'+str(num_rules)+'@')
-                        # print "added"+str(num_rules)
+
                     else:
                         # otherwise, reuse one of the unused rule numbers
                         new_num = unused_rules.pop(0)
@@ -239,26 +238,16 @@ def run_sequitur(input_string, comm):
                     num_rules += 1
                     rules_so_far[str(num_rules)] = last_digram
                     rules_so_far['0'] = rules_so_far['0'].replace(last_digram, '@'+str(num_rules)+'@')
-                    # print "added"+str(num_rules)
+
                 else:
                     new_num = unused_rules.pop(0)
                     rules_so_far[str(new_num)] = last_digram
                     rules_so_far['0'] = rules_so_far['0'].replace(last_digram, '@'+new_num+'@')
-                    # print "added"+new_num
+
                 rule_utility_bool = False
                 while not rule_utility_bool:
-                    print "%d has hit rule utility" % rank
                     rule_utility_bool, rules_so_far, unused_rules = rule_utility(rules_so_far, unused_rules)
     return rules_so_far
-    # end = time.time()
-    
-    # print rules_so_far
-
-    # # write rules into file
-    # writer = csv.writer(open('mainstring.txt', 'wb'))
-    # writer.writerow(rules_so_far['0'])
-    
-    # print "time: %f s" % (end - start)
     
 def parallel_sequitur(data, comm):
     rank = comm.Get_rank()
@@ -277,9 +266,8 @@ def parallel_sequitur(data, comm):
     else:
         received = comm.recv(source=0)
         data_block = received
-    print "Rank %d is running sequitur" % rank 
+
     rules = run_sequitur(data_block, comm)
-    print "Rank %d is ending sequitur" % rank 
 
     if rank != 0:
         comm.send(rules, dest=0)
@@ -291,6 +279,7 @@ def parallel_sequitur(data, comm):
     return cummulative_ruleset
 
 def main():
+    start = time.time()
     # correct usage if necessary
     if len(sys.argv) != 2:
         if rank == 0:
@@ -319,11 +308,11 @@ def main():
         
     # comm barrier to wait for all results to be sent
     comm.barrier()
-    print "inside the barrier"    
+
     # run the parallel_sequitur driver
     cummulative_ruleset = parallel_sequitur(data,comm)
     comm.barrier()
-    print "leaving the barrier"
+
         
     # recombine all the rules
     if rank == 0:
@@ -341,6 +330,9 @@ def main():
         output_string = input_file.split('.')[0]+'_mainstring.txt'
         writer2 = open('results/'+output_string, 'wb')
         writer2.write(masterrules['0'])
+    end = time.time()
+    if rank == 0:
+        print "time: %f s" % (end-start)
     return 0
 
 def testing():
