@@ -172,7 +172,9 @@ def non_overlap(list_of_ranges, target_range):
     return overlapping_ranges
 
 # very similar to serial implementation in serial.py
-def run_sequitur(input_string):
+def run_sequitur(input_string, comm):
+
+    rank = comm.Get_rank()
 
     # initialize values
     num_rules = 0
@@ -182,6 +184,8 @@ def run_sequitur(input_string):
 
     # serially iterate over all letters in string
     for i in range(len(input_string)):
+        print "%d: iterates over %s" % (rank, i)
+
         rules_so_far['0'] = rules_so_far['0'] + input_string[i]
         penult_symbol, last_symbol = last_two_symbols(rules_so_far['0'])
         last_digram = penult_symbol + last_symbol
@@ -243,6 +247,7 @@ def run_sequitur(input_string):
                     # print "added"+new_num
                 rule_utility_bool = False
                 while not rule_utility_bool:
+                    print "%d has hit rule utility" % rank
                     rule_utility_bool, rules_so_far, unused_rules = rule_utility(rules_so_far, unused_rules)
     return rules_so_far
     # end = time.time()
@@ -272,7 +277,9 @@ def parallel_sequitur(data, comm):
     else:
         received = comm.recv(source=0)
         data_block = received
-    rules = run_sequitur(data_block)
+    print "Rank %d is running sequitur" % rank 
+    rules = run_sequitur(data_block, comm)
+    print "Rank %d is ending sequitur" % rank 
 
     if rank != 0:
         comm.send(rules, dest=0)
@@ -312,10 +319,11 @@ def main():
         
     # comm barrier to wait for all results to be sent
     comm.barrier()
-        
+    print "inside the barrier"    
     # run the parallel_sequitur driver
     cummulative_ruleset = parallel_sequitur(data,comm)
     comm.barrier()
+    print "leaving the barrier"
         
     # recombine all the rules
     if rank == 0:
