@@ -296,7 +296,7 @@ def main():
     size = comm.Get_size()
 
     # set up file names
-    input_file = sys.arv[1]
+    input_file = sys.argv[1]
     output_file = input_file.split('.')[0]+'_grammar.csv'
     mainstring_file = input_file.split('.')[0]+'_mainstring.txt'
 
