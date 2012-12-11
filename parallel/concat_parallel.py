@@ -56,7 +56,7 @@ def first_symbol(test_string):
         result = input_str[place_holder:]
     return result
 
-def digram_uniqueness(rules):
+def digram_uniqueness(rules, num_rules):
     # find target digram
     last_digram = ''.join(last_two_symbols(rules['0']))
 
@@ -67,16 +67,15 @@ def digram_uniqueness(rules):
 
     if count == 1:
         # if exactly once, done!
-        return True, rules
+        return True, rules, num_rules
 
     else:
         # otherwise, create a new rule for this digram
-        global num_rules
         num_rules += 1
         for x in rules.keys():
             rules[x] = rules[x].replace(last_digram, str(num_rules))
             rules[str(num_rules)] = last_digram
-        return False, rules_so_far
+        return False, rules_so_far, num_rules
 
 def merge_and_replace(list_of_grammars):
     masterset = {}
@@ -100,13 +99,21 @@ def merge_and_replace(list_of_grammars):
                 masterset[str(num_rules)] = grammar[x]
 
             else:
-                # if the rule has been seen before
-                rule_to_use = back_dict[masterset[x]]
-                # use previous rule to rewrite main string
-                grammar['0'].replace(x, str(rule_to_use))
-                # save accordingly
-                grammar[rule_to_use] = grammar[x]
+                try:
+                    # if the rule has been seen before
+                    rule_to_use = back_dict[masterset[x]]
+                    # use previous rule to rewrite main string
+                    grammar['0'].replace(x, str(rule_to_use))
+                    # save accordingly
+                    grammar[rule_to_use] = grammar[x]
+                except:
+                    num_rules += 1
+                    # re-number rule and add to list of rules that have been seen before
+                    grammar['0'] = grammar['0'].replace('@'+x+'@', '@'+str(num_rules)+'@')
+                    back_dict[grammar[x]] = str(num_rules)
+                    masterset[str(num_rules)] = grammar[x]
 
+                                                                                                 
     # find all rules '0' and merge them
     stringMaster = ''
     for grammar in list_of_grammars:
@@ -116,7 +123,7 @@ def merge_and_replace(list_of_grammars):
     masterset['0'] = stringMaster
 
     # done! pat yourself on the back and return masterset
-    return masterset
+    return masterset, num_rules
 
 # testing function
 def make_test():
@@ -317,10 +324,10 @@ def main():
     # recombine all the rules
     if rank == 0:
         unused_rules = []
-        masterrules = merge_and_replace(cummulative_ruleset)
+        masterrules, num_rules = merge_and_replace(cummulative_ruleset)
         digram_bool, rule_bool = False, False
         while not digram_bool or not rule_bool:
-            digram_bool, masterrules = digram_uniqueness(masterrules)
+            digram_bool, masterrules, num_rules = digram_uniqueness(masterrules, num_rules)
             rule_bool, masterrules, unused_rules = rule_utility(masterrules, unused_rules)            
 
         output_file = input_file.split('.')[0]+'_grammar.csv'
