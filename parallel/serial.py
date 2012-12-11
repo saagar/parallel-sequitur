@@ -70,12 +70,13 @@ def main():
         return 1
 
     # define names for writing files
-    input_file = sys.argv[1] 
-    output_file = (input_file.split('.')[0])+'_grammar.csv'
-    mainstring_file = input_file.split('.')[0]+'_mainstring.txt'
+    input_file = sys.argv[1]
+    output_file = 'output_grammar.csv'
+    mainstring_file = 'output_mainstring.txt'
 
     # open input file for reading
-    f = open('books/'+input_file, 'rb')
+    #f = open('books/'+input_file, 'rb')
+    f = open(input_file,'rb')
     input_string = f.read()
     
     start = time.time()

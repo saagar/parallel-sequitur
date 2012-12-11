@@ -3,6 +3,7 @@ import collections
 from mpi4py import MPI
 import numpy as np
 import math
+import time
 
 input_string = "abracadabraarbadacarba"
 num_rules = 0
@@ -129,6 +130,7 @@ def main():
     rank = comm.Get_rank()
     size = comm.Get_size()
 
+    #stime = time.time()
     # master process will start the slaves
     if rank == 0:
         start_time = MPI.Wtime()
@@ -162,7 +164,7 @@ def main():
         # sort the words we want by length
         rulestomake.sort(key=len)
         #print rulestomake
-
+    stime = MPI.Wtime()
     # generate the rules from the count dictionary
     if rank == 0:
         for item in rulestomake:
@@ -224,6 +226,9 @@ def main():
         for x in compressed_text:
             mastercompressedstr += ' '.join(map(str,x)) + " "
         #print mastercompressedstr
+        etime = MPI.Wtime()
+        print "WC Total Time: %f" % (etime - stime)
+
         # save to file
         out = open("wcOUT.txt","w")
         out.write(mastercompressedstr + '\n')
@@ -233,6 +238,7 @@ def main():
        #print compressed_text
        #pass
 
+        
 
 if __name__ == "__main__":
     main()
