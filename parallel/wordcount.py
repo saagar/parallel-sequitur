@@ -9,7 +9,8 @@ input_string = "abracadabraarbadacarba"
 num_rules = 0
 
 #input_file = "books/ParadiseLost.txt"
-input_file = "books/KingJamesBible.txt"
+#input_file = "books/KingJamesBible.txt"
+input_file = "books/hobbit_wiki.txt"
 
 def slave(comm):
 
