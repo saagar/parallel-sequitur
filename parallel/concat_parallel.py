@@ -75,7 +75,7 @@ def digram_uniqueness(rules, num_rules):
         for x in rules.keys():
             rules[x] = rules[x].replace(last_digram, str(num_rules))
             rules[str(num_rules)] = last_digram
-        return False, rules_so_far, num_rules
+        return False, rules, num_rules
 
 def merge_and_replace(list_of_grammars):
     masterset = {}

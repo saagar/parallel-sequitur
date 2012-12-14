@@ -13,7 +13,7 @@
 #$ -q gpu.q
 # The number of processes to launch [1-32]
 # (Change the number)
-#$ -pe orte 16
+#$ -pe orte 8
 
 # Import environment and profile
 . /etc/profile
@@ -22,4 +22,4 @@ module load courses/cs205/2012
 # Launch the job with the above number of processes
 # (Only change the python file)
 #mpirun -n $NSLOTS python P1A.py
-mpirun -n $NSLOTS --mca btl_tcp_if_include eth0 python concat_parallel.py donning_a_mask.txt
+mpirun -n $NSLOTS --mca btl_tcp_if_include eth0 python concat_parallel.py hobbit.txt
