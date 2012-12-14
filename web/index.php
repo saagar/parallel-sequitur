@@ -109,8 +109,8 @@
           <h4><a href="program.php">The Code</a></h4>
           <p>Outlining the steps we took.</p>
 
-          <h4><a href="remarks.php">The Conclusion</a></h4>
-          <p>Closing remarks.</p>
+          <h4><a href="remarks.php">The Remarks</a></h4>
+          <p>Concluding remarks.</p>
 
           <h4><a href="resources.php">The Resources</a></h4>
           <p>Papers and things. The Credits.</p>
