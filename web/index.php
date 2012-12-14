@@ -82,6 +82,8 @@
       <div class="jumbotron">
         <h1 class="text-warning">Parallel Sequitur</h1>
 		<br>
+		<img src="img/sequitur-logo.gif">
+		<br><br>
         <p class="lead text-info" align="justify">
 			In an age of increasingly available data, quick data compression has become invaluable. The Sequitur algorithm is a lossless compression algorithm that creates a hierarchical representation of the original sequence by replacing repeated phrases iteratively.
 			This project is an attempt to parallelize Sequitur.
@@ -96,22 +98,22 @@
           <h4><a href="problem.php">The Problem</a></h4>
           <p> How we approached Sequitur in parallel</p>
 
-          <h4>The Performance</h4>
-          <p>Summary of our benchmarks.</p>
+          <h4><a href="performance.php">The Performance</a></h4>
+          <p>Summary of our speed benchmarks.</p>
 
-          <h4>The Results</h4>
-          <p>Did it work?</p>
+          <h4><a href="results.php">The Results</a></h4>
+          <p>Did it work? A look at compression reults.</p>
         </div>
 
         <div class="span6">
-          <h4>The Code</h4>
+          <h4><a href="program.php">The Code</a></h4>
           <p>Outlining the steps we took.</p>
 
-          <h4>The Conclusion</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+          <h4><a href="remarks.php">The Conclusion</a></h4>
+          <p>Closing remarks.</p>
 
-          <h4>The Resources</h4>
-          <p>Papers and things. The Credits</p>
+          <h4><a href="resources.php">The Resources</a></h4>
+          <p>Papers and things. The Credits.</p>
         </div>
       </div>
 
