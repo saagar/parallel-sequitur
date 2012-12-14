@@ -93,7 +93,7 @@
 
       <div class="row-fluid marketing">
         <div class="span6">
-          <h4>The Problem</h4>
+          <h4><a href="problem.php">The Problem</a></h4>
           <p> How we approached Sequitur in parallel</p>
 
           <h4>The Performance</h4>
