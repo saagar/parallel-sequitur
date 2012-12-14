@@ -104,7 +104,15 @@
 				
 				<h3> The Serial Method </h3>
 				
-                Sequitur forms a grammar from a sequence based on repeated phrases in that sequence. Because each re
+<p>Sequitur forms a grammar from a sequence based on repeated phrases in that sequence. Each repetition can be stored as a rule in the grammar, and the repeated subsequence can be replaced by a rule symbol, producing a more concise representation of the overall sequence. </p> 
+
+                <p>Although the implementation of Sequitur can vary, as we show in our project with our differing parallel verisons, the heart of the Sequitur relies on two basic principles:</p>
+<ul>
+                <li>Digram uniqueness: No digram can appear in either the main string or any of the rules more than once. If a digram does appear more than once, a new rule can be formed.</li>
+                <li>Rule utility: Every rule in the grammar must be used in either the main string or in the other rules more than once. If a rule is only used once in the entire grammar, then it can be collapsed to maintain grammar brevity.</li>
+</ul>
+
+                <p>In our serial code, we implemented the Sequitur algorithm according to the original paper. We therefore enforce digram uniqueness on each step in the algorithm. Because rule utility is more complicated, we wrote a separate function.</p>
 
 <h5>Rule Utility Function</h5>
 <div class="highlight"><pre><span class="k">def</span> <span class="nf">rule_utility</span><span class="p">(</span><span class="n">rules_so_far</span><span class="p">,</span> <span class="n">rule_list</span><span class="p">):</span>
@@ -126,7 +134,7 @@
 </pre></div>					
 				
 				
-				[TEXT GOES HERE]
+                                                                                                                                                                                                                                                                                                                                           <p> In our implementation of the rule utility function, we ensure that each rule is being used more than once by iterating over each rule and counting how many times it appears to in the grammar. If the count is less than 2, we consolidate that rule and delete it from the grammar.</p>
 				
 				
 				<h5>Serial Sequitur Algorithm</h5>			
