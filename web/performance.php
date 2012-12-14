@@ -95,17 +95,36 @@
 				For our benchmarking process, we ran a series of text through both the serial and Merge and Replace parallel versions of Sequitur, marking down the times as accurately as possible using the <code>MPI.Wtime()</code> and <code>time.time()</code>. We picked 5 articles of different lengths, which are contained in our repository on Github. For each text, we noticed that Merge and Replace was extremely faster and much more efficient. We were able to see massive speed ups in the process, proving to us that the parallel version of Sequitur benefits greatly from the parallelized MPI.
 			</p>
 				<?
-				$dir = "img/time/*";  
-				// Open a known directory, and proceed to read its contents  
-				foreach(glob($dir) as $file)  
-				{  
-					//echo "filename: $file : filetype: " . filetype($file) . "<br />";
-					echo "<img style='display: block; margin-left: auto; margin-right: auto;' src=".$file.">";
-				}
+					$dir = "img/time/*";  
+					// Open a known directory, and proceed to read its contents  
+					foreach(glob($dir) as $file)  
+					{  
+						//echo "filename: $file : filetype: " . filetype($file) . "<br />";
+						echo "<img style='display: block; margin-left: auto; margin-right: auto;' src=".$file.">";
+					}
 				?>
+			<p>The above images show the total time required for different file sizes and different numbers of processes.</p>
+				<?
+					$dir = "img/speedup/*";  
+					// Open a known directory, and proceed to read its contents  
+					foreach(glob($dir) as $file)  
+					{  
+						//echo "filename: $file : filetype: " . filetype($file) . "<br />";
+						echo "<img style='display: block; margin-left: auto; margin-right: auto;' src=".$file.">";
+					}
+				?>
+			<p>The above images show the speedups for different file sizes and different numbers of processes.</p>	
+				<?
+					$dir = "img/efficiency/*";  
+					// Open a known directory, and proceed to read its contents  
+					foreach(glob($dir) as $file)  
+					{  
+						//echo "filename: $file : filetype: " . filetype($file) . "<br />";
+						echo "<img style='display: block; margin-left: auto; margin-right: auto;' src=".$file.">";
+					}
+				?>
+			<p>The above images show the efficiencies for different file sizes and different numbers of processes.</p>	
 			
-			
-				
 			
 			<h4> Frequency Analysis Method Benchmarks</h4>
 			<p> 
@@ -126,6 +145,17 @@
 			<p>
 				We propose that the more radical Frequency Analysis method is better because of the way we attempt to exploit the nature of the English language as well as the way we exploit the usage of MPI. By using Master/Slave, we only require the input line to be iterated over two times completely. By looking at word frequency and optimizing for word length, we are able to very quickly determine the master ruleset in one iteration over the word counts. After determining a constant set of rules, we apply them in one iteration over the string. In the Merge and Result method, we continuous iterate over the string to create bigger and more useful rules, which causes an increase in time. However, Frequency Analysis does require increased communication and will fail when the input text is too small, because there is not enough work to be sent to the processes.
 			</p>
+			
+				<?
+					$dir = "img/comparison/*";  
+					// Open a known directory, and proceed to read its contents  
+					foreach(glob($dir) as $file)  
+					{  
+						//echo "filename: $file : filetype: " . filetype($file) . "<br />";
+						echo "<img style='display: block; margin-left: auto; margin-right: auto;' src=".$file.">";
+					}
+				?>
+			<p>The above images show the comparison for different file sizes and different numbers of processes of the Merge and Replace vs. the Frequency Analysis Method.</p>	
 		
 			<h3>Conclusion</h3>
 			<p> 
