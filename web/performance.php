@@ -94,8 +94,19 @@
 			<p> 
 				For our benchmarking process, we ran a series of text through both the serial and Merge and Replace parallel versions of Sequitur, marking down the times as accurately as possible using the <code>MPI.Wtime()</code> and <code>time.time()</code>. We picked 5 articles of different lengths, which are contained in our repository on Github. For each text, we noticed that Merge and Replace was extremely faster and much more efficient. We were able to see massive speed ups in the process, proving to us that the parallel version of Sequitur benefits greatly from the parallelized MPI.
 			</p>
-
-
+				<?
+				$dir = "img/time/*";  
+				// Open a known directory, and proceed to read its contents  
+				foreach(glob($dir) as $file)  
+				{  
+					//echo "filename: $file : filetype: " . filetype($file) . "<br />";
+					echo "<img style='display: block; margin-left: auto; margin-right: auto;' src=".$file.">";
+				}
+				?>
+			
+			
+				
+			
 			<h4> Frequency Analysis Method Benchmarks</h4>
 			<p> 
 				For our frequency analysis method, we only ran larger texts through the python program to note the time taken. We noticed immense speedups for our Wikipedia article, hobbit_wiki.txt, with the speedup for 8 processors at close to 500000 times the serial version, with an efficiency over 60000. This method seems extremely effective in terms of speed, possible because we iterate over the string 2 times rather than n times in the serial version. The Frequency Analysis method appears to be <code>O(2)</code> compared to <code>O(n^2)</code>. Because of the simplicity of the algorithm, we generate rules from substrings that can be easily found, as words are the smallest unit we deem useful for generating a rule, whereas the serial version will generate rules based on digrams as the smallest unit. We use a master/slave model to quickly count the words for rule generation, and apply the ruleset once over the string. This lack of immensive processing allows us to attempt compression on large files such as the King James' Bible (a file size of 4.2 M) in just under 2 seconds with 4 and 8 processors used with MPI.			
@@ -113,11 +124,14 @@
 				Furthermore, the efficiency of the frequency analysis approach is much hiegher than the merge and replace approach for the reasons explained earlier. Again, as the number of processes increases, the efficiency drops for the frequency analysis approach while it steadily climbs for the merge and replace approach.
 			</p>
 			<p>
-				We propose that the more radical Frequency Analysis method is better because of the way we attempt to exploit the nature of the English language as well as the way we exploit the usage of MPI. By using Master/Slave, we only require the input line to be iterated over two times completely. By looking at word frequency and optimizing for word length, we are able to very quickly determine the master ruleset in one iteration over the word counts.
+				We propose that the more radical Frequency Analysis method is better because of the way we attempt to exploit the nature of the English language as well as the way we exploit the usage of MPI. By using Master/Slave, we only require the input line to be iterated over two times completely. By looking at word frequency and optimizing for word length, we are able to very quickly determine the master ruleset in one iteration over the word counts. After determining a constant set of rules, we apply them in one iteration over the string. In the Merge and Result method, we continuous iterate over the string to create bigger and more useful rules, which causes an increase in time. However, Frequency Analysis does require increased communication and will fail when the input text is too small, because there is not enough work to be sent to the processes.
 			</p>
 		
 			<h3>Conclusion</h3>
-			<p> some final words </p>
+			<p> 
+				After running a significant number of tests, we can confidently claim that parallelization of Sequitur improves speedup and efficiency when following the strict Sequitur method. However, in terms of speed and efficiency, we propose a newer, more radical approach to Sequitur compression which is based on frequency analysis. Furthermore, we believe taht a combination of frequency analysis and pure Sequitur may provide an improvement in compression while maintaining improved speedups over the serial algorithm.
+			
+			</p>
 	
 		</div>
 	  
