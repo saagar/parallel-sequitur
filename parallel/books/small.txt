@@ -1,0 +1,8 @@
+SEQUITUR is an algorithm that infers a hierarchical structure from a sequence of discrete symbols
+by replacing repeated phrases with a grammatical rule that generates the phrase, and continuing
+this process recursively. The result is a hierarchical representation of the original sequence, which
+offers insights into its lexical structure. The algorithm is driven by two constraints that reduce the
+size of the grammar, and produce structure as a by-product. SEQUITUR breaks new ground by
+operating incrementally. Moreover, the method’s simple structure permits a proof that it operates
+in space and time that is linear in the size of the input. Our implementation can process 50,000
+symbols per second and has been applied to an extensive range of real world sequences.
