@@ -91,22 +91,29 @@
 		<div id="container">
 			<h3> Performance Benchmarks on Speed </h3>
 			<h4> Merge and Replace Benchmarks</h4>
-			<p> [TEXT AND PICTURES GO HERE] serial vs MR</p>
+			<p> 
+				For our benchmarking process, we ran a series of text through both the serial and Merge and Replace parallel versions of Sequitur, marking down the times as accurately as possible using the <code>MPI.Wtime()</code> and <code>time.time()</code>. We picked 5 articles of different lengths, which are contained in our repository on Github. For each text, we noticed that Merge and Replace was extremely faster and much more efficient. We were able to see massive speed ups in the process, proving to us that the parallel version of Sequitur benefits greatly from the parallelized MPI.
+			</p>
 
 
 			<h4> Frequency Analysis Method Benchmarks</h4>
-			<p> MORE TEXT HERE! serial vs frequency analysis</p>
+			<p> 
+				For our frequency analysis method, we only ran larger texts through the python program to note the time taken. We noticed immense speedups for our Wikipedia article, hobbit_wiki.txt, with the speedup for 8 processors at close to 500000 times the serial version, with an efficiency over 60000. This method seems extremely effective in terms of speed, possible because we iterate over the string 2 times rather than n times in the serial version. The Frequency Analysis method appears to be <code>O(2)</code> compared to <code>O(n^2)</code>. Because of the simplicity of the algorithm, we generate rules from substrings that can be easily found, as words are the smallest unit we deem useful for generating a rule, whereas the serial version will generate rules based on digrams as the smallest unit. We use a master/slave model to quickly count the words for rule generation, and apply the ruleset once over the string. This lack of immensive processing allows us to attempt compression on large files such as the King James' Bible (a file size of 4.2 M) in just under 2 seconds with 4 and 8 processors used with MPI.			
+			</p>
 			
 			<h4> Which parallel method is faster? </h4>
-			[NEED TO FIX THIS PART!!]
+			
 			<p>
-			For parallel sequitur time, we note that the frequency analysis approach is much faster than the merge and replace approach for small number of processes. This intuitively makes sense because the frequency analysis approach utilizes the parallelization of MPI better; however, for larger number of proccesses, it seems that the communication overhead makes the two approaches about even.
+				It is of some importance to note that while both parallel methods are faster than the serial method, we were able to get significant speedups with our more radical approach. When we compared the Merge and Replace method with the the Frequency Analysis method, we saw that the word counting approach was by far the better method in terms of pure speed benchmarks.
 			</p>
 			<p>
-			Looking to speedup now, we see that frequency analysis approach has a much higher speedup for moderate number of processes. Again, we suspect this is because of the communication overhead. When we communicate with 16 processes many many times, the speedup drops significantly.
+				For parallel sequitur time, we note that the frequency analysis approach is much faster than the merge and replace approach for small number of processes. This intuitively makes sense because the frequency analysis approach utilizes the parallelization of MPI better; however, for larger number of proccesses, it seems that the communication overhead makes the two approaches about even.	The frequency analysis approach has a much higher speedup for moderate number of processes. Again, we suspect this is because of the communication overhead. When we communicate with 16 processes many many times, the speedup drops significantly.
 			</p>
 			<p>
-			Lastly, the efficiency of the frequency analysis approach is much hiegher than the merge and replace approach for the reasons explained earlier. Again, as the number of processes increases, the efficiency drops for the frequency analysis approach while it steadily climbs for the merge and replace approach.
+				Furthermore, the efficiency of the frequency analysis approach is much hiegher than the merge and replace approach for the reasons explained earlier. Again, as the number of processes increases, the efficiency drops for the frequency analysis approach while it steadily climbs for the merge and replace approach.
+			</p>
+			<p>
+				We propose that the more radical Frequency Analysis method is better because of the way we attempt to exploit the nature of the English language as well as the way we exploit the usage of MPI. By using Master/Slave, we only require the input line to be iterated over two times completely. By looking at word frequency and optimizing for word length, we are able to very quickly determine the master ruleset in one iteration over the word counts.
 			</p>
 		
 			<h3>Conclusion</h3>
