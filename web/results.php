@@ -89,7 +89,18 @@
       <hr>
 
 		<div id="container">
+			<h3> Performance Benchmarks on Compression Performance </h3>
+			<h4> Merge and Replace Benchmarks</h4>
+			<p> [TEXT AND PICTURES GO HERE] serial vs MR</p>
+
+
+			<h4> Frequency Analysis Method Benchmarks</h4>
+			<p> MORE TEXT HERE! serial vs frequency analysis</p>
 			
+			
+		
+			<h3>Sequitur: Theory vs. Application  </h3>
+			<p> some final words </p>
 			
 	
 		</div>
