@@ -83,14 +83,38 @@
 		<div class="jumbotron">
 			<h2 class="muted">Parallel Sequitur</h2>
 			<h2 class="text-info">The Problem</h2>
-
 		</div>
 
       <hr>
 
 		<div id="container">
+			<h3> Sequitur Compression </h3>
+				
+			<p> For our final project, we decided to parallelize the Sequitur compression algorithm. Sequitur is a lossless compression algorithm that creates a hierarchical representation of the original sequence by replacing repeated phrases iteratively. Simply put, Sequitur attempts to compress a string by iterating over each pair of characters, called a digram. Whenever Sequitur sees that a digram has been repeated, the algorithm creates a rule for that digram and replaces all occurances of that digram in the string. By this logic, we should only ever see a digram once in the entire body of our string and ruleset; this is called <b style="color:green">Digram Uniqueness</b>. Sequitur also checks the ruleset constantly to make sure that all rules are used more than once. If a rule is used only one time throughout the set, Sequitur merges the rules by applying the singly-used rule, then removing it. By doing this, we can get rules which contain frequently seen substrings larger than 2 characters. This is called <b style="color:green">Rule Utility</b> and allows us to compress the ruleset as well as the original string.</p>
 			
-	
+			<p>
+				For example, we can compress the string <code> abracadabraarbadacarba </code>. As Sequitur iterates over the string, it sees that the digram <code>ab</code> is repeated (<code><b style="color:blue">ab</b>racad<b style="color:blue">ab</b>raarbadacarba</code>). We can create a rule, <code> 1 -> ab </code> and apply it to the string to get <code><b style="color:blue">1</b>racad<b style="color:blue">1</b>raarbadacarba</code>. The final result is shown below, where Rule 0 is the compressed string.
+				<br>
+				<pre><code>			
+				0: 1c2132ac3a
+				1: abra
+				2: ad
+				3: arb
+				</code></pre>			
+			</p>
+			
+			
+			<h3>Parallelizing Sequitur</h3>
+			<h4>The Idea Behind Merge and Replace</h4>
+			<p> 
+				Naturally, Sequitur is a serial compression algorithm which iterates over the input string several times. Because this algorithm requires us to sequentially make a decision over the next digram seen, one immediate issue when parallelizing Sequitur is that we need to split up the input and somehow merge all the compressed sets together afterwards. Using MPI, we decided that the best way to do this would be to run Sequitur on each process and merge the rulesets together in serial on the master process. The reasoning for this is that iteration is the most expensive computation we can do on the strings, and the rule sets returned are small enough to be globally merged and updated by the single master process.
+			</p>
+			
+			<h3>Going Beyond the Rules</h3>
+			<h4>Choose Your Words Carefully</h4>
+			<p>
+				After understanding how Sequitur works, we decided to try a more radical approach. Because Sequitur compresses by using frequency of substrings, we wondered if preprocessing the text would allow us to more easily compress. Our Frequency Analysis approach attempts to compress by first doing a word count over the entire text. We then create rules for all words that are used more than once in the text, and run Sequitur, replacing all the words for their corresponding rules. Using this approach, we believe that we can compress large texts in less time than the original parallel Sequitur because we only need to iterate over the string twice and create the ruleset once.
+			</p>
 		</div>
 	  
 

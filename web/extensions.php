@@ -89,7 +89,15 @@
       <hr>
 
 		<div id="container">
+			<h3> Extensions </h3>
+				
+			<p> Extension 1 - rule passing </p>
 			
+			<p> Extension 2 - rule overlapping </p>
+			
+			<h3>Improvements</h3>
+			
+			<p> better rule presentation with pointers </p>
 	
 		</div>
 	  

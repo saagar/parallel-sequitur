@@ -105,8 +105,69 @@
 				<h3> The Serial Method </h3>
 				
 				[TEXT GOES HERE]
+
+<h5>Rule Utility Function</h5>
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">rule_utility</span><span class="p">(</span><span class="n">rules_so_far</span><span class="p">,</span> <span class="n">rule_list</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">rules_so_far</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;&gt;</span> <span class="s">&#39;0&#39;</span><span class="p">]:</span>
+        <span class="c"># count how many times each rule besides the main string is used</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">other_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">rules_so_far</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">rule</span> <span class="o">&lt;&gt;</span> <span class="n">a</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">other_keys</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="n">rules_so_far</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+        <span class="c"># if rule is only used once, consolidate</span>
+        <span class="k">if</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">other_keys</span><span class="p">:</span>
+                <span class="n">rules_so_far</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">rules_so_far</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;@&#39;</span><span class="o">+</span><span class="n">rule</span><span class="o">+</span><span class="s">&#39;@&#39;</span><span class="p">,</span> <span class="n">rules_so_far</span><span class="p">[</span><span class="n">rule</span><span class="p">])</span>
+            <span class="k">del</span> <span class="n">rules_so_far</span><span class="p">[</span><span class="n">rule</span><span class="p">]</span>
+            <span class="n">rule_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">False</span><span class="p">,</span> <span class="n">rules_so_far</span><span class="p">,</span> <span class="n">rule_list</span>
+    <span class="k">return</span> <span class="bp">True</span><span class="p">,</span> <span class="n">rules_so_far</span><span class="p">,</span> <span class="n">rule_list</span>
+    
+</pre></div>					
 				
-				<br>
+				
+				[TEXT GOES HERE]
+				
+				
+				<h5>Serial Sequitur Algorithm</h5>			
+<div class="highlight"><pre>
+<span class="c"># if this occurrence is a complete rule, enforce rule</span>
+<span class="k">if</span> <span class="n">entire_bool</span><span class="p">:</span>
+	<span class="c"># replace new digram with corresponding rule</span>
+	<span class="n">rules_so_far</span><span class="p">[</span><span class="s">&#39;0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rules_so_far</span><span class="p">[</span><span class="s">&#39;0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">last_digram</span><span class="p">,</span> <span class="s">&#39;@&#39;</span><span class="o">+</span><span class="n">rule_num</span><span class="o">+</span><span class="s">&#39;@&#39;</span><span class="p">)</span>
+
+	<span class="c"># check rule utility</span>
+	<span class="n">rule_utility_bool</span> <span class="o">=</span> <span class="bp">False</span>
+	<span class="k">while</span> <span class="ow">not</span> <span class="n">rule_utility_bool</span><span class="p">:</span>
+		<span class="n">rule_utility_bool</span><span class="p">,</span> <span class="n">rules_so_far</span><span class="p">,</span> <span class="n">unused_rules</span> <span class="o">=</span> <span class="n">rule_utility</span><span class="p">(</span><span class="n">rules_so_far</span><span class="p">,</span> <span class="n">unused_rules</span><span class="p">)</span>
+
+<span class="c"># otherwise create new rule and replace inside other rule</span>
+<span class="k">else</span><span class="p">:</span>
+	<span class="c"># if there are no unused rules, increment num_rules</span>
+	<span class="k">if</span> <span class="n">unused_rules</span> <span class="o">==</span> <span class="p">[]:</span>
+		<span class="n">num_rules</span> <span class="o">+=</span> <span class="mi">1</span>
+		<span class="n">rules_so_far</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">num_rules</span><span class="p">)]</span> <span class="o">=</span> <span class="n">last_digram</span>
+		<span class="n">rules_so_far</span><span class="p">[</span><span class="n">rule_num</span><span class="p">]</span> <span class="o">=</span> <span class="n">rules_so_far</span><span class="p">[</span><span class="n">rule_num</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">last_digram</span><span class="p">,</span> <span class="s">&#39;@&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">num_rules</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;@&#39;</span><span class="p">)</span>
+
+	<span class="c"># otherwise, reuse one of the unused rule numbers</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">new_num</span> <span class="o">=</span> <span class="n">unused_rules</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+		<span class="n">rules_so_far</span><span class="p">[</span><span class="n">new_num</span><span class="p">]</span> <span class="o">=</span> <span class="n">last_digram</span>
+
+		<span class="c"># attempt to replace last digram in rules</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">rules_so_far</span><span class="p">[</span><span class="n">rule_num</span><span class="p">]</span> <span class="o">=</span> <span class="n">rules_so_far</span><span class="p">[</span><span class="n">rule_num</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">last_digram</span><span class="p">,</span> <span class="s">&#39;@&#39;</span><span class="o">+</span><span class="n">new_num</span><span class="o">+</span><span class="s">&#39;@&#39;</span><span class="p">)</span>
+		<span class="k">except</span><span class="p">:</span>
+			<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">rules_so_far</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span>  <span class="s">&#39;0&#39;</span> <span class="o">!=</span> <span class="n">a</span><span class="p">]:</span>
+				<span class="n">rules_so_far</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">rules_so_far</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">last_digram</span><span class="p">,</span> <span class="s">&#39;@&#39;</span><span class="o">+</span><span class="n">new_num</span><span class="o">+</span><span class="s">&#39;@&#39;</span><span class="p">)</span>
+
+	<span class="n">rule_utility_bool</span> <span class="o">=</span> <span class="bp">False</span>
+	<span class="k">while</span> <span class="ow">not</span> <span class="n">rule_utility_bool</span><span class="p">:</span>
+		<span class="n">rule_utility_bool</span><span class="p">,</span> <span class="n">rules_so_far</span><span class="p">,</span> <span class="n">unused_rules</span> <span class="o">=</span> <span class="n">rule_utility</span><span class="p">(</span><span class="n">rules_so_far</span><span class="p">,</span> <span class="n">unused_rules</span><span class="p">)</span>
+    
+</pre></div>				
+
+			
 				
 				<h3> Parallel Approach 1: Merge and Replace </h3>
 					<p>

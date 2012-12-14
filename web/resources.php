@@ -89,8 +89,19 @@
       <hr>
 
 		<div id="container">
+			<h3>Sources</h3>
+			<ul>
+				<li>Original Paper: <a href="http://www.jair.org/media/374/live-374-1630-jair.pdf">Identifying Hierarchical Structure in Sequences: A linear-time algorithm</a></li>
+				<li><a href="http://sequitur.info">The Sequitur Website</a></li>
+			</ul>
 			
-	
+			<h3>Acknowledgements</h3>
+			<ul>
+				<li><a href="http://www.andres.sc/">Bjoern Andres</a> - project mentor</li>
+<li><a href="http://crisco.seas.harvard.edu/">Cris Cecka</a>, <a href="http://gvi.seas.harvard.edu/pfister">Hanspeter Pfister</a> - for instructional material on MPI</li>
+<li><a href="http://www.eecs.harvard.edu/~michaelm/">Michael Mitzenmacher</a> - for introducing us to Sequitur and a general love of algorithms</li>
+<li><a href="http://craig.nevill-manning.com/">Craig G. Nevill-Manning</a>, <a href="http://www.cs.waikato.ac.nz/~ihw/">Ian H. Witten</a> - for creating Sequitur</li>
+			</ul>
 		</div>
 	  
 

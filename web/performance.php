@@ -89,7 +89,28 @@
       <hr>
 
 		<div id="container">
+			<h3> Performance Benchmarks on Speed </h3>
+			<h4> Merge and Replace Benchmarks</h4>
+			<p> [TEXT AND PICTURES GO HERE] serial vs MR</p>
+
+
+			<h4> Frequency Analysis Method Benchmarks</h4>
+			<p> MORE TEXT HERE! serial vs frequency analysis</p>
 			
+			<h4> Which parallel method is faster? </h4>
+			[NEED TO FIX THIS PART!!]
+			<p>
+			For parallel sequitur time, we note that the frequency analysis approach is much faster than the merge and replace approach for small number of processes. This intuitively makes sense because the frequency analysis approach utilizes the parallelization of MPI better; however, for larger number of proccesses, it seems that the communication overhead makes the two approaches about even.
+			</p>
+			<p>
+			Looking to speedup now, we see that frequency analysis approach has a much higher speedup for moderate number of processes. Again, we suspect this is because of the communication overhead. When we communicate with 16 processes many many times, the speedup drops significantly.
+			</p>
+			<p>
+			Lastly, the efficiency of the frequency analysis approach is much hiegher than the merge and replace approach for the reasons explained earlier. Again, as the number of processes increases, the efficiency drops for the frequency analysis approach while it steadily climbs for the merge and replace approach.
+			</p>
+		
+			<h3>Conclusion</h3>
+			<p> some final words </p>
 	
 		</div>
 	  
