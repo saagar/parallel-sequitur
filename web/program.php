@@ -104,7 +104,7 @@
 				
 				<h3> The Serial Method </h3>
 				
-				[TEXT GOES HERE]
+                Sequitur forms a grammar from a sequence based on repeated phrases in that sequence. Because each re
 
 <h5>Rule Utility Function</h5>
 <div class="highlight"><pre><span class="k">def</span> <span class="nf">rule_utility</span><span class="p">(</span><span class="n">rules_so_far</span><span class="p">,</span> <span class="n">rule_list</span><span class="p">):</span>
