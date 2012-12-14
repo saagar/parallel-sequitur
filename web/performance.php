@@ -52,7 +52,8 @@
       }
     </style>
     <link href="css/bootstrap-responsive.css" rel="stylesheet">
-
+	<link href="css/pygments.css" rel="stylesheet">
+	
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -73,55 +74,36 @@
     <div class="container-narrow">
       <div class="masthead">
 		<ul class="nav nav-pills pull-left">
-          <? navBar("home"); ?>
+          <? navBar("performance"); ?>
         </ul>
       </div>
 
       <hr>
 
-      <div class="jumbotron">
-        <h1 class="text-warning">Parallel Sequitur</h1>
-		<br>
-        <p class="lead text-info" align="justify">
-			In an age of increasingly available data, quick data compression has become invaluable. The Sequitur algorithm is a lossless compression algorithm that creates a hierarchical representation of the original sequence by replacing repeated phrases iteratively.
-			This project is an attempt to parallelize Sequitur.
-		</p>
-        
-      </div>
+		<div class="jumbotron">
+			<h2 class="muted">Parallel Sequitur</h2>
+			<h2 class="text-info">The Performance</h2>
+
+		</div>
 
       <hr>
 
-      <div class="row-fluid marketing">
-        <div class="span6">
-          <h4>The Problem</h4>
-          <p> How we approached Sequitur in parallel</p>
+		<div id="container">
+			
+	
+		</div>
+	  
 
-          <h4>The Performance</h4>
-          <p>Summary of our benchmarks.</p>
-
-          <h4>The Results</h4>
-          <p>Did it work?</p>
-        </div>
-
-        <div class="span6">
-          <h4>The Code</h4>
-          <p>Outlining the steps we took.</p>
-
-          <h4>The Conclusion</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-          <h4>The Resources</h4>
-          <p>Papers and things. The Credits</p>
-        </div>
-      </div>
 
       <hr>
 
       <div class="footer">
+	  <div class="span10">
 		<p>
 			A Computer Science 205 Final Project by Irene Chen and Saagar Deshpande</br>
 			Harvard University
 		</p>		
+		</div>
       </div>
 
     </div> <!-- /container -->
@@ -143,5 +125,7 @@
     <script src="js/bootstrap-carousel.js"></script>
     <script src="js/bootstrap-typeahead.js"></script>
 
+	
+	
   </body>
 </html>
